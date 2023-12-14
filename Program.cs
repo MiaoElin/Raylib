@@ -6,9 +6,9 @@ public class Program
     {
         Raylib.InitWindow(800, 480, "Hello World!");
         Raylib.SetTargetFPS(60);
-
+        Context con = new Context();
+        con.Initialize();
         //声明我方飞机
-        PlaneEntity plane = PlaneEntity.CreatePlane(new(400, 240), Color.BLUE, 20, 50, 100);
 
         //声明敌人s
         PlaneEntity[] enemies = new PlaneEntity[200000];
@@ -37,8 +37,16 @@ public class Program
             //玩家输入
             input.Process();
 
-            //我机 移动
+            //我机 行为
+            PlaneEntity plane = con.plane;
             plane.Move(input.moveAxis, deltaTime);
+            // 我机 无敌时间
+            plane.invincibleTimer -= deltaTime;
+            if (plane.invincibleTimer <= 0)
+            {
+                plane.invincibleTimer = 0;
+            }
+
 
             //敌人 生成
             timeSpawnTimer -= deltaTime;
@@ -57,7 +65,7 @@ public class Program
                 bulletCount++;
             }
 
-            //敌人 移动
+            //敌人 行为
             //遍历每架飞机，移动每架飞机,如果敌人碰到我机，我机血槽-10
             for (int i = 0; i < enemyCount; i++)
             {
@@ -67,11 +75,17 @@ public class Program
 
                 if (Intersect.IsCircleIntersect(plane.pos, plane.radius, cur.pos, cur.radius))
                 {
-                    plane.hp -= 10;
-                    if (plane.hp == 0)
+
+                    if (plane.invincibleTimer <= 0)
                     {
-                        plane.isDead = true;
+                        plane.invincibleTimer = plane.invincibleInterval;
+                        plane.hp -= 10;
+                        if (plane.hp <= 0)
+                        {
+                            plane.isDead = true;
+                        }
                     }
+
                 }
                 enemies[i] = cur;
             }
@@ -83,8 +97,8 @@ public class Program
                 var bul = bullets[i];
                 nearlyEnemy = Find.FindNearEnemy(bul.pos, enemies, enemyCount, out nearlyEnemyIndex);
                 if (nearlyEnemyIndex != -1)
-                {         
-                       // 2.子弹移向敌人
+                {
+                    // 2.子弹移向敌人
                     Vector2 dir = nearlyEnemy.pos - bul.pos;
                     bul.Move(dir, deltaTime);
 
@@ -92,7 +106,7 @@ public class Program
                     if (Intersect.IsCircleIntersect(nearlyEnemy.pos, nearlyEnemy.radius, bul.pos, bul.radius))
                     {
 
-                        nearlyEnemy.isDead = true;
+                        enemies[nearlyEnemyIndex].isDead = true;
                         bul.isDead = true;
 
                     }
@@ -150,6 +164,8 @@ public class Program
             }
             Raylib.EndDrawing();
 
+            // 覆盖context
+            con.plane = plane;
 
         }
         Raylib.CloseWindow();

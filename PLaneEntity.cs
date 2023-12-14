@@ -8,6 +8,8 @@ public struct PlaneEntity
     public float moveSpeed;
     public bool isDead;
     public int hp;
+    public float invincibleTimer;
+    public float invincibleInterval;
     public void Move(Vector2 dir, float dt)
     {
         pos += Raymath.Vector2Normalize(dir) * moveSpeed * dt;
@@ -22,6 +24,8 @@ public struct PlaneEntity
         plane.moveSpeed = moveSpeed;
         plane.isDead = false;
         plane.hp = hp;
+        plane.invincibleInterval= 1f;
+        plane.invincibleTimer=plane.invincibleInterval;
         return plane;
     }
     public void Draw()
