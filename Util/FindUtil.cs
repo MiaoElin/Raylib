@@ -1,8 +1,9 @@
 using System.Numerics;
 using Raylib_cs;
-public static class Find
+
+public static class FindUtil
 {
-    public static PlaneEntity FindNearEnemy( Vector2 pos, PlaneEntity[] enemies, int enemiesCount,out int nearlyEnemyIndex)
+    public static PlaneEntity FindNearEnemy(Vector2 pos, PlaneEntity[] enemies, int enemiesCount, out int nearlyEnemyIndex)
     {
         PlaneEntity nearlyEnemy = default;
         float nearDistan = float.MaxValue;
@@ -11,7 +12,8 @@ public static class Find
         for (int i = 0; i < enemiesCount; i++)
         {
             var cur = enemies[i];
-            if(cur.isDead){
+            if (cur.isDead)
+            {
                 continue;
             }
             enemyPlaneDistance = Vector2.Distance(pos, enemies[i].pos);
@@ -22,7 +24,7 @@ public static class Find
                 nearlyEnemy = enemies[i];
                 index = i;
             }
-            
+
         }
         nearlyEnemyIndex = index;
         return nearlyEnemy;
