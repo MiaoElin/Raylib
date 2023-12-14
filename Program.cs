@@ -44,7 +44,7 @@ public class Program
             timeSpawnTimer -= deltaTime;
             if (timeSpawnTimer <= 0)
             {
-                timeSpawnTimer =timeSpawnInterval;
+                timeSpawnTimer = timeSpawnInterval;
                 PlaneEntity newEnemy = PlaneEntity.CreatePlane(RandomUtil.GetRandomPosOnEdge(800, 480), Color.RED, 20, 30, 10);
                 enemies[enemyCount] = newEnemy;
                 enemyCount++;
@@ -76,45 +76,75 @@ public class Program
                 enemies[i] = cur;
             }
 
-            //子弹 移动
-            // 1.找到最近的敌人
-            nearlyEnemy = Find.FindNearEnemy(plane.pos, enemies, enemyCount, out nearlyEnemyIndex);
-            // 2.子弹移向敌人(通过遍历的方式 从第一颗子弹开始发射)
+            //子弹 移动(通过遍历的方式 从第一颗子弹开始发射)
             for (int i = 0; i < bulletCount; i++)
             {
-                var cur = bullets[i];
-                Vector2 dir = nearlyEnemy.pos - cur.pos;
-                cur.Move(dir, deltaTime);
+                // 1.找到最近的敌人
+                var bul = bullets[i];
+                nearlyEnemy = Find.FindNearEnemy(bul.pos, enemies, enemyCount, out nearlyEnemyIndex);
+                if (nearlyEnemyIndex != -1)
+                {         
+                       // 2.子弹移向敌人
+                    Vector2 dir = nearlyEnemy.pos - bul.pos;
+                    bul.Move(dir, deltaTime);
 
-                // 3.如果子弹敌人相撞，敌人子弹移除
-                if (Intersect.IsCircleIntersect(nearlyEnemy.pos, nearlyEnemy.radius, cur.pos, cur.radius))
+                    // 3.如果子弹敌人相撞，敌人子弹移除
+                    if (Intersect.IsCircleIntersect(nearlyEnemy.pos, nearlyEnemy.radius, bul.pos, bul.radius))
+                    {
+
+                        nearlyEnemy.isDead = true;
+                        bul.isDead = true;
+
+                    }
+                }
+                else
                 {
+                    // todo 子弹继续朝原始方向移动
+                    bul.MoveByLastDir(deltaTime);
 
-                    //敌人移除
-                    RemoveUtil.RemoveEnemy(enemyCount, nearlyEnemyIndex, nearlyEnemy, enemies);
+                }
+
+                bullets[i] = bul;
+
+            }
+            // 销毁的遍历，要用倒序；
+            // 敌人移除
+            for (int i = enemyCount - 1; i >= 0; i--)
+            {
+                if (enemies[i].isDead)
+                {
+                    RemoveUtil.RemoveEnemy(enemyCount, i, enemies[i], enemies);
                     enemyCount -= 1;
 
-                    //子弹移除
-                    RemoveUtil.RemoveBullet(bulletCount, i, cur, bullets);
+                }
+
+            }
+            // 子弹移除
+            for (int i = bulletCount - 1; i >= 0; i--)
+            {
+                if (bullets[i].isDead)
+                {
+                    RemoveUtil.RemoveBullet(bulletCount, i, bullets[i], bullets);
                     bulletCount -= 1;
                 }
-                bullets[i] = cur;
-
             }
 
-            //我机 绘制
-            if(!plane.isDead){
-                plane.Draw(plane.color);
+            // 我机 绘制
+            if (!plane.isDead)
+            {
+                plane.Draw();
             }
-                
+
             //敌人 绘制
             for (int i = 0; i < enemyCount; i++)
             {
+                // 画不会改变enemies[],所以用完不用再覆盖回去
                 var cur = enemies[i];
-                cur.Draw(enemies[i].color);
+                cur.Draw();
             }
             //子弹 绘制
-            for(int i =0;i<bulletCount;i++){
+            for (int i = 0; i < bulletCount; i++)
+            {
                 var cur = bullets[i];
                 bullets[i].Draw();
             }

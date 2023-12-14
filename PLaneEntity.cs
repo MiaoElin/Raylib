@@ -24,7 +24,7 @@ public struct PlaneEntity
         plane.hp = hp;
         return plane;
     }
-    public void Draw(Color color)
+    public void Draw()
     {
         Raylib.DrawCircleV(pos, radius, color);
     }

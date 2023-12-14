@@ -28,7 +28,7 @@ public struct InputEntity
     }
     public bool isShootProcess()
     {
-        if (Raylib.IsKeyDown(KeyboardKey.KEY_SPACE))
+        if (Raylib.IsKeyPressed(KeyboardKey.KEY_SPACE))
         {
             return true;
         }

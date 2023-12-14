@@ -7,10 +7,13 @@ public static class Find
         PlaneEntity nearlyEnemy = default;
         float nearDistan = float.MaxValue;
         float enemyPlaneDistance;
-        int index =default;
+        int index = -1;
         for (int i = 0; i < enemiesCount; i++)
         {
             var cur = enemies[i];
+            if(cur.isDead){
+                continue;
+            }
             enemyPlaneDistance = Vector2.Distance(pos, enemies[i].pos);
 
             if (enemyPlaneDistance < nearDistan)
