@@ -3,6 +3,8 @@ using System.Numerics;
 public struct InputEntity
 {
     public Vector2 moveAxis;
+    public Vector2 mousePos;
+    public bool isMouseClick;
     public void Process()
     {
         float x = 0;
@@ -25,6 +27,10 @@ public struct InputEntity
         }
         moveAxis.X = x;
         moveAxis.Y = y;
+
+        mousePos = Raylib.GetMousePosition();
+
+        isMouseClick = Raylib.IsMouseButtonPressed(MouseButton.MOUSE_LEFT_BUTTON);
     }
     public bool isShootProcess()
     {
